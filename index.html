@@ -2487,6 +2487,126 @@ footer {
 section {
   position: relative;
 }
+
+
+/* ============================================
+   HAMBURGER MENU - CSS FIXES FOR MOBILE
+   ============================================ */
+
+/* Update the mobile menu styles in your CSS */
+
+@media (max-width: 768px) {
+  .hamburger-menu {
+    display: flex;
+  }
+
+  nav .container {
+    padding: 1rem 1.5rem;
+  }
+
+  nav .nav-links {
+    position: fixed;
+    top: 60px;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    background: oklch(0.12 0.04 310 / 0.95);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    gap: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s var(--transition-luxe);
+    z-index: 999;
+  }
+
+  /* THIS IS THE KEY FIX - Changed from .active to match JavaScript */
+  nav .nav-links.active {
+    max-height: calc(100vh - 60px); /* Changed from 400px to allow full viewport height minus navbar */
+    border-bottom: 1px solid oklch(0.85 0.12 80 / 0.1);
+    overflow-y: auto; /* Allow scrolling if menu is too long */
+  }
+
+  nav .nav-links li {
+    border-bottom: 1px solid oklch(0.85 0.12 80 / 0.1);
+    width: 100%;
+  }
+
+  nav .nav-links li a {
+    display: block;
+    padding: 1rem 1.5rem;
+    font-size: 0.875rem;
+  }
+
+  nav .nav-links a.active {
+    border-bottom: none;
+    border-left: 3px solid var(--gold);
+    padding-left: calc(1.5rem - 3px);
+  }
+
+  .btn-book {
+    padding: 0.625rem 1rem;
+    font-size: 0.75rem;
+  }
+  
+  .nav-book-btn {
+    display: block;
+    border-bottom: none !important;
+    padding: 1rem 1.5rem !important;
+    width: 100%;
+  }
+  
+  .nav-book-btn .btn-book {
+    width: 100%;
+    justify-content: center;
+    padding: 0.75rem 1rem;
+  }
+
+  .logo-icon {
+    width: 170px;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+}
+
+/* ============================================
+   HAMBURGER ANIMATION FIX
+   ============================================ */
+
+.hamburger-menu {
+  display: none;
+  flex-direction: column;
+  cursor: pointer;
+  gap: 0.5rem;
+  background: none;
+  border: none;
+  padding: 0;
+  z-index: 1001; /* Make sure hamburger is above menu */
+}
+
+.hamburger-menu span {
+  width: 25px;
+  height: 2.5px;
+  background: var(--foreground);
+  border-radius: 2px;
+  transition: all 0.3s var(--transition-luxe);
+}
+
+/* Fixed: Now using .active instead of checking for active state on different element */
+.hamburger-menu.active span:nth-child(1) {
+  transform: rotate(45deg) translate(10px, 10px);
+}
+
+.hamburger-menu.active span:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger-menu.active span:nth-child(3) {
+  transform: rotate(-45deg) translate(7px, -7px);
+}
    </style>
 </head>
 <body>
@@ -2504,21 +2624,24 @@ section {
                 </div>
                 
             </a>
-            <ul class="nav-links" id="nav-links">
+            <ul class="nav-links" id="mobile-menu">
                 <li><a href="#home">Home</a></li>
                 <li><a href="about">About</a></li>
                 <li><a href="services#salon">Salon Services</a></li>
                 <li><a href="services#bridal">Bridal Makeup</a></li>
                 <li><a href="services#academy">Beauty Academy</a></li>
+                
             </ul>
-            <button class="hamburger-menu" id="hamburger-btn">
+            <a href="appointment" class="btn-book">Book Now</a>
+            <button class="hamburger-menu" id="hamburger">
                 <span></span>
                 <span></span>
                 <span></span>
             </button>
-            <a href="appointment" class="btn-book">Book Now</a>
+            
         </div>
     </nav>
+  
         <div class="hero-content">
             
             <div class="hero-tag glass-1">
@@ -2892,31 +3015,58 @@ section {
 </footer>
 
     <script>
-        // Hamburger Menu Toggle
-        const hamburgerBtn = document.getElementById('hamburger-btn');
-        const navLinks = document.getElementById('nav-links');
-
-        hamburgerBtn.addEventListener('click', () => {
-            hamburgerBtn.classList.toggle('active');
-            navLinks.classList.toggle('active');
-        });
-
-        // Close menu when a link is clicked
-        document.querySelectorAll('.nav-links a').forEach(link => {
-            link.addEventListener('click', () => {
-                hamburgerBtn.classList.remove('active');
-                navLinks.classList.remove('active');
+          /// Navbar scroll effect
+    const navbar = document.querySelector('nav');
+    window.addEventListener('scroll', () => {
+      navbar.classList.toggle('scrolled', window.scrollY > 20);
+    });
+ 
+    // Mobile menu toggle - FIXED VERSION
+    const hamburger = document.getElementById('hamburger');
+    const mobileMenu = document.getElementById('mobile-menu');
+    
+    hamburger.addEventListener('click', () => {
+      const isOpen = mobileMenu.classList.toggle('active'); // Changed from 'open' to 'active'
+      hamburger.classList.toggle('active'); // Add animation to hamburger
+      hamburger.setAttribute('aria-expanded', isOpen);
+    });
+ 
+    // Close mobile menu on link click
+    mobileMenu.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        mobileMenu.classList.remove('active'); // Changed from 'open' to 'active'
+        hamburger.classList.remove('active');
+        hamburger.setAttribute('aria-expanded', 'false');
+      });
+    });
+ 
+    // Active Navigation Link Tracking
+    function setActiveNavLink() {
+        const sections = document.querySelectorAll('section[id]');
+        const navLinks = document.querySelectorAll('.nav-links a');
+ 
+        window.addEventListener('scroll', () => {
+            let currentActiveSection = '';
+ 
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+ 
+                if (window.scrollY >= sectionTop - 200 && window.scrollY < sectionTop + sectionHeight - 200) {
+                    currentActiveSection = section.getAttribute('id');
+                }
+            });
+ 
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === '#' + currentActiveSection) {
+                    link.classList.add('active');
+                }
             });
         });
-
-        // Close menu when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!e.target.closest('nav')) {
-                hamburgerBtn.classList.remove('active');
-                navLinks.classList.remove('active');
-            }
-        });
-
+    }
+ 
+    document.addEventListener('DOMContentLoaded', setActiveNavLink);
         // Active Navigation Link Tracking
         function setActiveNavLink() {
             const sections = document.querySelectorAll('section[id]');
