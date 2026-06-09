@@ -3362,6 +3362,231 @@ footer {
 section {
   position: relative;
 }
+
+/* ============================================
+   CRITICAL FIXES FOR HAMBURGER BUTTON
+   ============================================ */
+
+/* FIX #1: Ensure nav doesn't overflow */
+nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: oklch(0.12 0.04 310 / 0.7);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px); 
+  border-bottom: 1px solid oklch(0.85 0.12 80 / 0.1);
+  overflow: hidden;  /* ← ADD THIS - Prevents overflow */
+  width: 100%;       /* ← ADD THIS - Ensures full width */
+}
+
+/* FIX #2: Fix nav container layout */
+nav .container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  width: 100%;       /* ← ADD THIS */
+  overflow: visible; /* ← ADD THIS */
+}
+
+/* FIX #3: Ensure logo doesn't take too much space */
+.logo {
+  font-family: "Playfair Display", serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--foreground);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;  /* ← ADD THIS - Logo won't shrink */
+}
+
+.logo-icon {
+  width: 200px;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;  /* ← IMPORTANT - Logo icon won't shrink */
+}
+
+.logo-icon img {
+  width: 100%;
+  object-fit: contain;
+}
+
+/* FIX #4: Hamburger button must stay visible on mobile */
+.hamburger-menu {
+  display: none;
+  flex-direction: column;
+  cursor: pointer;
+  gap: 0.5rem;
+  background: none;
+  border: none;
+  padding: 0;
+  z-index: 1001;  /* ← Make sure it's above nav */
+  flex-shrink: 0;  /* ← CRITICAL: Don't shrink! */
+  margin-left: auto;  /* ← Push to the right */
+}
+
+.hamburger-menu span {
+  width: 25px;
+  height: 2.5px;
+  background: var(--foreground);
+  border-radius: 2px;
+  transition: all 0.3s var(--transition-luxe);
+}
+
+.hamburger-menu.active span:nth-child(1) {
+  transform: rotate(45deg) translate(10px, 10px);
+}
+
+.hamburger-menu.active span:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger-menu.active span:nth-child(3) {
+  transform: rotate(-45deg) translate(7px, -7px);
+}
+
+/* FIX #5: Nav links shouldn't push button off-screen */
+nav .nav-links {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+  list-style: none;
+  flex: 1;  /* ← ADD THIS - Takes remaining space but won't overflow */
+  margin: 0;  /* ← ADD THIS - Remove default margins */
+  padding: 0;  /* ← ADD THIS - Remove default padding */
+}
+
+/* FIX #6: Button book should have flex-shrink: 0 */
+.btn-book {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: var(--gradient-gold);
+  color: var(--gold-foreground);
+  text-decoration: none;
+  border-radius: 9999px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  box-shadow: var(--shadow-glow-gold);
+  transition: transform 0.3s var(--transition-luxe);
+  flex-shrink: 0;  /* ← ADD THIS - Button won't shrink */
+  white-space: nowrap;  /* ← ADD THIS - Prevent text wrapping */
+}
+
+.btn-book:hover {
+  transform: scale(1.05);
+}
+
+/* ============================================
+   MOBILE MENU - CRITICAL FIXES
+   ============================================ */
+
+@media (max-width: 768px) {
+  /* Show hamburger on mobile */
+  .hamburger-menu {
+    display: flex;
+  }
+
+  /* Hide nav links by default on mobile */
+  nav .nav-links {
+    position: fixed;
+    top: 60px;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    background: oklch(0.12 0.04 310 / 0.95);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    gap: 0;
+    max-height: 0;  /* ← Hidden by default */
+    overflow: hidden;
+    transition: max-height 0.3s var(--transition-luxe);
+    z-index: 999;
+    width: 100%;  /* ← Full width */
+    box-sizing: border-box;  /* ← Include padding in width */
+  }
+
+  /* Show nav links when active */
+  nav .nav-links.active {
+    max-height: calc(100vh - 60px);
+    border-bottom: 1px solid oklch(0.85 0.12 80 / 0.1);
+    overflow-y: auto;
+  }
+
+  nav .nav-links li {
+    border-bottom: 1px solid oklch(0.85 0.12 80 / 0.1);
+    width: 100%;
+  }
+
+  nav .nav-links li a {
+    display: block;
+    padding: 1rem 1.5rem;
+    font-size: 0.875rem;
+  }
+
+  nav .nav-links a.active {
+    border-bottom: none;
+    border-left: 3px solid var(--gold);
+    padding-left: calc(1.5rem - 3px);
+  }
+
+  /* Mobile button styling */
+  nav .container {
+    padding: 1rem 1.5rem;
+  }
+
+  .btn-book {
+    padding: 0.625rem 1rem;
+    font-size: 0.75rem;
+  }
+  
+  .nav-book-btn {
+    display: block;
+    border-bottom: none !important;
+    padding: 1rem 1.5rem !important;
+    width: 100%;
+  }
+  
+  .nav-book-btn .btn-book {
+    width: 100%;
+    justify-content: center;
+    padding: 0.75rem 1rem;
+  }
+
+  .logo-icon {
+    width: 170px;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+}
+
+/* ============================================
+   PREVENT BODY OVERFLOW
+   ============================================ */
+
+body {
+  overflow-x: hidden;  /* ← CRITICAL: Prevent horizontal scroll */
+  background: var(--gradient-dark);
+  background-attachment: fixed;
+  color: var(--foreground);
+  font-family: "Inter", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  font-weight: 400;
+}
     
     </style>
 </head>
@@ -3371,27 +3596,32 @@ section {
         <div class="hero-orb-2 orb animate-float"></div>
         <div class="hero-overlay"></div>
         <nav>
-        <div class="container" style="margin-bottom: 10px;">
-            <a href="#" class="logo">
-                <div class="logo-icon">
-                  <img src="./assets/s4ulogo.svg">
-                </div>
-            </a>
-            <ul class="nav-links" id="nav-links">
-                <li><a href="index">Home</a></li>
-                <li><a href="about">About</a></li>
-                <li><a href="services#salon">Salon Services</a></li>
-                <li><a href="services#bridal">Bridal Makeup</a></li>
-                <li><a href="services#academy">Beauty Academy</a></li>
-            </ul>
-            <button class="hamburger-menu" id="hamburger-btn">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
-            <a href="appointment" class="btn-book">Book Now</a>
+<div class="container" style="margin-bottom: 10px;">
+    <a href="#" class="logo">
+        <div class="logo-icon">
+          <img src="./assets/s4ulogo.svg">
         </div>
-    </nav>
+    </a>
+    <!-- FIXED: Changed id from "nav-links" to "mobile-menu" -->
+    <ul class="nav-links" id="mobile-menu">
+        <li><a href="index">Home</a></li>
+        <li><a href="about">About</a></li>
+        <li><a href="services#salon">Salon Services</a></li>
+        <li><a href="services#bridal">Bridal Makeup</a></li>
+        <li><a href="services#academy">Beauty Academy</a></li>
+        <!-- FIXED: Moved "Book Now" inside the menu and wrapped it in nav-book-btn -->
+        <li class="nav-book-btn">
+            <a href="appointment" class="btn-book">Book Now</a>
+        </li>
+    </ul>
+    <!-- FIXED: Changed id from "hamburger-btn" to "hamburger" -->
+    <button class="hamburger-menu" id="hamburger">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+</div>
+</nav>
         <div class="hero-content">
             
              <div class="section-label">— Our Story —</div>
@@ -3632,9 +3862,9 @@ section {
                     
                     <!-- Email -->
                     <li>
-                        <a href="mailto:hello@s4ubeauty.com" class="footer-contact-link">
+                        <a href="mailto:s4ubeautylounge@gmail.com" class="footer-contact-link">
                             <i class="fas fa-envelope"></i>
-                            <span>hello@s4ubeauty.com</span>
+                            <span>s4ubeautylounge@gmail.com</span>
                         </a>
                     </li>
                     
@@ -3655,6 +3885,109 @@ section {
         </div>
     </div>
 </footer>
+
+<script>
+  // Wait for DOM to load
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🔍 DOM Loaded - Initializing hamburger menu...');
+    
+    // Get elements
+    const hamburger = document.getElementById('hamburger');
+    const mobileMenu = document.getElementById('mobile-menu');
+    
+    // Debug: Check if elements exist
+    console.log('📌 Hamburger button found:', hamburger ? '✅ Yes' : '❌ No');
+    console.log('📌 Mobile menu found:', mobileMenu ? '✅ Yes' : '❌ No');
+    
+    if (!hamburger || !mobileMenu) {
+        console.error('❌ ERROR: Could not find hamburger or mobile-menu elements!');
+        console.error('   - Make sure nav has id="hamburger" on the button');
+        console.error('   - Make sure nav-links has id="mobile-menu" on the ul');
+        return; // Stop if elements don't exist
+    }
+    
+    // ===== HAMBURGER CLICK HANDLER =====
+    hamburger.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        console.log('🔨 Hamburger clicked!');
+        
+        // Toggle the active class on menu
+        const isNowActive = mobileMenu.classList.toggle('active');
+        
+        // Toggle the active class on hamburger (for animation)
+        hamburger.classList.toggle('active');
+        
+        // Set aria-expanded for accessibility
+        hamburger.setAttribute('aria-expanded', isNowActive);
+        
+        console.log('📂 Menu is now:', isNowActive ? 'OPEN ✅' : 'CLOSED ❌');
+    });
+    
+    // ===== CLOSE MENU WHEN CLICKING LINKS =====
+    const menuLinks = mobileMenu.querySelectorAll('a');
+    console.log('🔗 Found', menuLinks.length, 'menu links');
+    
+    menuLinks.forEach((link, index) => {
+        link.addEventListener('click', function(e) {
+            console.log('🔗 Link clicked:', link.href);
+            
+            // Don't close for external links (like appointment)
+            if (link.href.includes('appointment') || link.href.includes('http')) {
+                console.log('   → External link, keeping menu open');
+                return;
+            }
+            
+            // Close menu for internal navigation
+            console.log('   → Closing menu');
+            mobileMenu.classList.remove('active');
+            hamburger.classList.remove('active');
+            hamburger.setAttribute('aria-expanded', 'false');
+        });
+    });
+    
+    // ===== CLOSE MENU WHEN CLICKING OUTSIDE =====
+    document.addEventListener('click', function(e) {
+        // If click is not on hamburger or menu, close the menu
+        if (!hamburger.contains(e.target) && !mobileMenu.contains(e.target)) {
+            if (mobileMenu.classList.contains('active')) {
+                console.log('👆 Clicked outside - closing menu');
+                mobileMenu.classList.remove('active');
+                hamburger.classList.remove('active');
+                hamburger.setAttribute('aria-expanded', 'false');
+            }
+        }
+    });
+    
+    // ===== CLOSE MENU ON ESC KEY =====
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && mobileMenu.classList.contains('active')) {
+            console.log('⌨️ ESC pressed - closing menu');
+            mobileMenu.classList.remove('active');
+            hamburger.classList.remove('active');
+            hamburger.setAttribute('aria-expanded', 'false');
+        }
+    });
+    
+    console.log('✅ Hamburger menu initialized successfully!');
+    console.log('💡 Open browser console to see debug messages');
+});
+ 
+// ===== SMOOTH SCROLL FOR ANCHOR LINKS =====
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        const href = this.getAttribute('href');
+        // Only smooth scroll if it's a valid anchor and page exists
+        if (href !== '#' && document.querySelector(href)) {
+            e.preventDefault();
+            document.querySelector(href).scrollIntoView({behavior: 'smooth'});
+        }
+    });
+});
+ 
+console.log('📱 Hamburger menu script loaded. Check console for debug info.');
+</script>
 
     <!-- SEO SCHEMA -->
     <script type="application/ld+json">
